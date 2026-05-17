@@ -5,11 +5,13 @@
 
 void utils_do_search(AppState *app, const char *pattern, int dir) {
     if (!pattern || pattern[0] == '\0') return;
-    strncpy(app->last_pattern, pattern, sizeof(app->last_pattern) - 1);
-    app->last_search_dir = dir;
+    app->search_failed = false;
 
     regex_t regex;
-    if (regcomp(&regex, pattern, REG_EXTENDED | REG_NOSUB) != 0) return;
+    if (regcomp(&regex, pattern, REG_EXTENDED) != 0) {
+        app->search_failed = true;
+        return;
+    }
 
     size_t current_raw = 0;
     for (size_t i = 0; i < app->doc.line_count; i++) {
@@ -22,15 +24,35 @@ void utils_do_search(AppState *app, const char *pattern, int dir) {
 
     int found = -1;
     if (dir == 1) {
+        // Search forward from next line
         for (size_t i = current_raw + 1; i < app->doc.line_count; i++) {
             if (regexec(&regex, app->doc.raw_lines[i], 0, NULL, 0) == 0) {
                 found = (int)i;
                 break;
             }
         }
+        // Wraparound
+        if (found == -1) {
+            for (size_t i = 0; i <= current_raw; i++) {
+                if (regexec(&regex, app->doc.raw_lines[i], 0, NULL, 0) == 0) {
+                    found = (int)i;
+                    break;
+                }
+            }
+        }
     } else {
+        // Search backward from previous line
         if (current_raw > 0) {
             for (int i = (int)current_raw - 1; i >= 0; i--) {
+                if (regexec(&regex, app->doc.raw_lines[i], 0, NULL, 0) == 0) {
+                    found = i;
+                    break;
+                }
+            }
+        }
+        // Wraparound
+        if (found == -1) {
+            for (int i = (int)app->doc.line_count - 1; i >= (int)current_raw; i--) {
                 if (regexec(&regex, app->doc.raw_lines[i], 0, NULL, 0) == 0) {
                     found = i;
                     break;
@@ -41,6 +63,8 @@ void utils_do_search(AppState *app, const char *pattern, int dir) {
 
     if (found != -1) {
         app->scroll_y = (int)app->layout.raw_to_display[found];
+    } else {
+        app->search_failed = true;
     }
 
     regfree(&regex);

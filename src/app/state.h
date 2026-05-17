@@ -16,6 +16,7 @@ typedef struct AppState {
     volatile sig_atomic_t resize_pending;
     char last_pattern[256];
     int last_search_dir;
+    bool search_failed;
     bool running;
 } AppState;
 

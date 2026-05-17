@@ -35,6 +35,9 @@ Ink follows a Go-inspired **Domain-Driven Design (DDD)** where each feature set 
 - **Regex Search Engine**:
     - Forward (`/`) and Backward (`?`) search using POSIX Extended Regular Expressions.
     - Repeating searches (`n`, `N`) with direction persistence.
+    - **Visual Highlighting**: Real-time ANSI-inverted highlighting of all matches.
+    - **Wraparound Search**: Automatic document loop-back when no further matches exist.
+    - **Clear Search**: Press `Esc` to instantly remove all active highlighting.
 - **GNU Less Aesthetic**: Minimalist colon prompt with inverted `(END)` indicator at file completion.
 
 ## 4. Getting Started
