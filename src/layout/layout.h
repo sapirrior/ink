@@ -1,7 +1,7 @@
 #ifndef INK_LAYOUT_H
 #define INK_LAYOUT_H
 
-#include "document.h"
+#include "../document/document.h"
 #include <stddef.h>
 
 typedef struct {

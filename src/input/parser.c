@@ -1,4 +1,4 @@
-#include "ui/input.h"
+#include "input.h"
 #include <unistd.h>
 #include <sys/select.h>
 #include <string.h>

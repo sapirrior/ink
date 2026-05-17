@@ -1,4 +1,5 @@
-#include "ui/renderer.h"
+#include "view.h"
+#include "../app/state.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,4 +48,36 @@ void rb_free(RenderBuf *rb) {
     rb->data = NULL;
     rb->len = 0;
     rb->cap = 0;
+}
+
+void view_render_screen(AppState *app) {
+    RenderBuf rb;
+    rb_init(&rb);
+
+    rb_append(&rb, "\x1b[H", 3);
+
+    int margin = (app->ts.cols * 8) / 100;
+    int view_height = app->ts.rows - 1;
+
+    for (int i = 0; i < view_height; i++) {
+        int line_idx = app->scroll_y + i;
+        rb_printf(&rb, "\x1b[%d;1H\x1b[2K", i + 1);
+
+        if (line_idx < (int)app->layout.count) {
+            for (int j = 0; j < margin; j++) rb_append(&rb, " ", 1);
+            rb_append(&rb, app->layout.display_lines[line_idx], strlen(app->layout.display_lines[line_idx]));
+        }
+    }
+
+    rb_printf(&rb, "\x1b[%d;1H\x1b[2K", app->ts.rows);
+
+    int current_last_line = app->scroll_y + view_height;
+    if (current_last_line >= (int)app->layout.count) {
+        rb_append(&rb, "\x1b[7m(END)\x1b[m", 13);
+    } else {
+        rb_append(&rb, ":", 1);
+    }
+
+    rb_flush(&rb);
+    rb_free(&rb);
 }

@@ -9,16 +9,20 @@ Ink is a minimalist, high-performance successor to GNU `less`, written in C11 wi
 - **Dependencies**: None (Standard C Library & POSIX APIs only)
 
 ## 2. Architectural Design
-The project is modularized into three distinct layers:
-- **`src/core/`**: 
-    - `document`: Line-buffered file I/O using `getline`.
-    - `layout`: The layout engine responsible for dynamic 8% margins and smart word-wrapping (preventing mid-word breaks). It maintains a `raw_to_display` map for precise navigation.
-- **`src/ui/`**:
-    - `terminal`: POSIX `termios` raw mode management and ANSI escape sequence handling.
-    - `renderer`: Aggregate `RenderBuf` implementation for zero-flicker transactional updates.
-    - `input`: Non-blocking multi-byte ANSI sequence parsing for navigation keys.
-- **`src/utils/`**: Robust error handling and common utility routines.
+Ink follows a Go-inspired **Domain-Driven Design (DDD)** where each feature set is encapsulated in an autonomous module.
+- **Single Header Rule**: Each module directory (e.g., `src/document/`) exposes its public API through exactly ONE unified header file (`document.h`). Internal logic is split across multiple `.c` files within the same directory.
+- **AppState Centralization**: A global `AppState` struct (`src/app/state.h`) anchors all domain-specific data, enabling decoupled interaction between modules.
+- **Command Pattern**: User actions are strictly isolated into individual files under `src/commands/` (e.g., `nav/up.c`, `search/execute.c`), orchestrated by a central dispatcher.
 
+### Core Modules:
+- `src/app/`: Orchestration and event loop.
+- `src/document/`: File I/O and text buffering.
+- `src/layout/`: Smart wrapping and coordinate mapping.
+- `src/terminal/`: POSIX raw mode and ANSI sequence management.
+- `src/view/`: Screen rendering and prompt handling.
+- `src/input/`: Keystroke parsing.
+- `src/utils/`: Generic helpers and the POSIX regex search engine.
+- `src/commands/`: Isolated action handlers categorized by domain.
 ## 3. Core Features
 - **Smart Word-Wrapping**: Splits text at spaces or hyphens to maintain legibility.
 - **Dynamic Margins**: Automatically applies 8% side padding based on terminal width.

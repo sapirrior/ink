@@ -1,14 +1,8 @@
-#include "core/document.h"
-#include "utils/utils.h"
+#include "document.h"
+#include "../utils/utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-void doc_init(Document *doc) {
-    doc->raw_lines = NULL;
-    doc->line_count = 0;
-    doc->line_cap = 0;
-}
 
 void doc_load_file(Document *doc, const char *filename) {
     FILE *f = fopen(filename, "r");
@@ -32,12 +26,4 @@ void doc_load_file(Document *doc, const char *filename) {
     }
     free(line);
     fclose(f);
-}
-
-void doc_free(Document *doc) {
-    for (size_t i = 0; i < doc->line_count; i++) {
-        free(doc->raw_lines[i]);
-    }
-    free(doc->raw_lines);
-    doc_init(doc);
 }

@@ -1,14 +1,6 @@
-#include "core/layout.h"
+#include "layout.h"
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-
-void layout_init(Layout *layout) {
-    layout->display_lines = NULL;
-    layout->raw_to_display = NULL;
-    layout->count = 0;
-    layout->cap = 0;
-}
 
 static void layout_add_line(Layout *layout, const char *line) {
     if (layout->count >= layout->cap) {
@@ -28,7 +20,7 @@ void layout_compute(Layout *layout, Document *doc, int cols) {
 
     int margin = (cols * 8) / 100;
     int content_width = cols - (2 * margin);
-    if (content_width <= 0) content_width = cols; // Fallback for very narrow terminals
+    if (content_width <= 0) content_width = cols;
 
     for (size_t i = 0; i < doc->line_count; i++) {
         if (layout->raw_to_display) layout->raw_to_display[i] = layout->count;
@@ -48,26 +40,20 @@ void layout_compute(Layout *layout, Document *doc, int cols) {
                 break;
             }
 
-            // Find best split point
             size_t end = start + content_width;
             size_t split = end;
-
-            // Search backwards for a space or hyphen
             while (split > start && raw[split] != ' ' && raw[split] != '-') {
                 split--;
             }
 
             if (split == start) {
-                // No split point found, hard wrap
                 char buf[content_width + 1];
                 strncpy(buf, raw + start, content_width);
                 buf[content_width] = '\0';
                 layout_add_line(layout, buf);
                 start += content_width;
             } else {
-                // Split at the space/hyphen
                 size_t split_len = split - start;
-                // If it's a hyphen, we keep it in the current line. If it's a space, we skip it.
                 if (raw[split] == '-') split_len++; 
                 
                 char buf[split_len + 1];
@@ -76,17 +62,8 @@ void layout_compute(Layout *layout, Document *doc, int cols) {
                 layout_add_line(layout, buf);
                 
                 start = split;
-                if (raw[split] == ' ') start++; // Skip the space
+                if (raw[split] == ' ') start++;
             }
         }
     }
-}
-
-void layout_free(Layout *layout) {
-    for (size_t i = 0; i < layout->count; i++) {
-        free(layout->display_lines[i]);
-    }
-    free(layout->display_lines);
-    if (layout->raw_to_display) free(layout->raw_to_display);
-    layout_init(layout);
 }
