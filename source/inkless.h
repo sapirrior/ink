@@ -1,7 +1,14 @@
 #ifndef INKLESS_H
 #define INKLESS_H
 
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+#define _DEFAULT_SOURCE
+#define _DARWIN_C_SOURCE
+#endif
+
+#ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>

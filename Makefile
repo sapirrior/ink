@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c11 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -pedantic -O2 -Isource
+CFLAGS = -std=c11 -Wall -Wextra -pedantic -O2 -Isource
 LDFLAGS = 
 
 PREFIX ?= /usr/local
