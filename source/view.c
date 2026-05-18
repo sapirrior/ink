@@ -75,12 +75,13 @@ void view_read_prompt(AppState *app, char prompt_char, char *buf, size_t size) {
     buf[0] = '\0';
     terminal_show_cursor();
 
+    RenderBuf rb;
+    rb_init(&rb);
+
     while (1) {
-        RenderBuf rb;
-        rb_init(&rb);
-        rb_printf(&rb, "\x1b[%d;1H\x1b[2K%c%s", app->ts.rows, prompt_char, buf);
+        rb.len = 0;
+        rb_printf(&rb, "\x1b[%d;1H\x1b[m\x1b[2K%c%s", app->ts.rows, prompt_char, buf);
         rb_flush(&rb);
-        rb_free(&rb);
 
         int c = input_read_key();
         if (c == '\r' || c == '\n') break;
@@ -92,7 +93,16 @@ void view_read_prompt(AppState *app, char prompt_char, char *buf, size_t size) {
             buf[len] = '\0';
         }
     }
+    rb_free(&rb);
     terminal_hide_cursor();
+}
+
+void view_render_colon_prompt(AppState *app) {
+    RenderBuf rb;
+    rb_init(&rb);
+    rb_printf(&rb, "\x1b[%d;1H\x1b[m\x1b[2K:", app->ts.rows);
+    rb_flush(&rb);
+    rb_free(&rb);
 }
 
 /* --- Screen Rendering --- */
@@ -101,7 +111,7 @@ static void view_render_help(AppState *app, RenderBuf *rb) {
     int rows = app->ts.rows;
     int cols = app->ts.cols;
     
-    rb_append(rb, "\x1b[2J\x1b[H", 7);
+    rb_append(rb, "\x1b[m\x1b[2J\x1b[H", 10);
     
     const char *title = "--- Ink Pager Help ---";
     int title_len = (int)strlen(title);
@@ -130,7 +140,7 @@ void view_render_screen(AppState *app) {
         return;
     }
 
-    rb_append(&rb, "\x1b[H", 3);
+    rb_append(&rb, "\x1b[m\x1b[H", 6);
 
     int margin = (app->ts.cols * 8) / 100;
     int view_height = app->ts.rows - 1;
@@ -171,7 +181,11 @@ void view_render_screen(AppState *app) {
                     rb_append(&rb, ptr + pmatch.rm_so, match_len);
                     rb_append(&rb, "\x1b[m", 3);
                     ptr += pmatch.rm_eo;
-                    if (pmatch.rm_so == pmatch.rm_eo) ptr++;
+                    if (pmatch.rm_so == pmatch.rm_eo) {
+                        if (*ptr == '\0') break;
+                        rb_append(&rb, ptr, 1);
+                        ptr++;
+                    }
                     if (*ptr == '\0') break;
                 }
                 rb_append(&rb, ptr, strlen(ptr));

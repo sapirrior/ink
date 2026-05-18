@@ -67,4 +67,5 @@ make clean    # Removes the build directory
     - **Defensive I/O**: Strict `realloc` validation and CRLF handling during file load.
     - **Memory Safety**: OOB prevention in layout mapping and dynamic RenderBuf sizing to eliminate overflow risks.
     - **Robust Navigation**: Clamped scroll and view logic ensures stability during extreme terminal resizing.
+    - **ANSI Hygiene**: Strict attribute resetting prevents UI glitches (e.g., screen inversion) during prompt interactions.
 - **Tone**: Technical documentation and commit messages follow a factual, hyperbole-free professional standard.

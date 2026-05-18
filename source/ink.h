@@ -120,6 +120,7 @@ void rb_flush(RenderBuf *rb);
 void rb_free(RenderBuf *rb);
 void view_render_screen(AppState *app);
 void view_read_prompt(AppState *app, char prompt_char, char *buf, size_t size);
+void view_render_colon_prompt(AppState *app);
 
 /* commands.c */
 void command_dispatch(AppState *app, int key);
