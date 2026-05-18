@@ -1,5 +1,5 @@
 use crate::app::App;
-use super::utils::clamp_scroll;
+use super::cmd_utils::clamp_scroll;
 
 pub fn nav_up(app: &mut App) {
     if app.scroll_y > 0 { app.scroll_y -= 1; }

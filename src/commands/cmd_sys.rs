@@ -1,5 +1,5 @@
 use crate::app::App;
-use super::utils::{read_prompt, clamp_scroll};
+use super::cmd_utils::{read_prompt, clamp_scroll};
 
 pub fn sys_colon(app: &mut App) {
     let buf = read_prompt(app, ':');
@@ -12,7 +12,6 @@ pub fn sys_colon(app: &mut App) {
         "p" => if app.current_file_index > 0 {
             app.switch_file(app.current_file_index - 1);
         },
-        "q" => app.running = false,
         "N" => app.show_line_numbers = !app.show_line_numbers,
         _ => {
             if let Ok(line) = buf.parse::<usize>() {

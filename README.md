@@ -53,15 +53,15 @@ ls -R | ./target/release/inkless
 |-----|--------|
 | `j` / `Down` | Scroll down one line |
 | `k` / `Up` | Scroll up one line |
-| `f` / `Space` | Page down |
-| `b` | Page up |
-| `g` / `<` | Jump to top |
-| `G` / `>` | Jump to end |
+| `f` / `PageDown` | Page down |
+| `b` / `PageUp` | Page up |
+| `g` / `Home` | Jump to top |
+| `G` / `End` | Jump to end |
 | `/` | Search forward |
 | `?` | Search backward |
 | `n` / `N` | Repeat search / Reverse repeat |
 | `:N` | Toggle line numbers |
-| `:q` / `q` | Quit |
+| `q` | Quit |
 | `h` | Help |
 
 ## License

@@ -1,6 +1,6 @@
 use crate::app::App;
 use crate::input::Key;
-use super::{nav, search, sys};
+use super::{cmd_nav, cmd_search, cmd_sys};
 
 pub fn dispatch(app: &mut App, key: Key) {
     if app.search_failed { app.search_failed = false; }
@@ -16,19 +16,19 @@ pub fn dispatch(app: &mut App, key: Key) {
     }
 
     match key {
-        Key::Up | Key::Char('k') => nav::nav_up(app),
-        Key::Down | Key::Char('j') => nav::nav_down(app),
-        Key::PageUp | Key::Char('b') => nav::nav_page_up(app),
-        Key::PageDown | Key::Char(' ') | Key::Char('f') => nav::nav_page_down(app),
-        Key::Char('u') => nav::nav_half_up(app),
-        Key::Char('d') => nav::nav_half_down(app),
-        Key::Home | Key::Char('g') | Key::Char('<') => nav::nav_home(app),
-        Key::End | Key::Char('G') | Key::Char('>') => nav::nav_end(app),
-        Key::Char('/') => search::search_forward(app),
-        Key::Char('?') => search::search_backward(app),
-        Key::Char('n') => search::search_next(app),
-        Key::Char('N') => search::search_prev(app),
-        Key::Char(':') => sys::sys_colon(app),
+        Key::Up | Key::Char('k') => cmd_nav::nav_up(app),
+        Key::Down | Key::Char('j') => cmd_nav::nav_down(app),
+        Key::PageUp | Key::Char('b') => cmd_nav::nav_page_up(app),
+        Key::PageDown | Key::Char('f') => cmd_nav::nav_page_down(app),
+        Key::Char('u') => cmd_nav::nav_half_up(app),
+        Key::Char('d') => cmd_nav::nav_half_down(app),
+        Key::Home | Key::Char('g') => cmd_nav::nav_home(app),
+        Key::End | Key::Char('G') => cmd_nav::nav_end(app),
+        Key::Char('/') => cmd_search::search_forward(app),
+        Key::Char('?') => cmd_search::search_backward(app),
+        Key::Char('n') => cmd_search::search_next(app),
+        Key::Char('N') => cmd_search::search_prev(app),
+        Key::Char(':') => cmd_sys::sys_colon(app),
         Key::Char('h') => app.show_help = true,
         Key::Esc => app.last_pattern.clear(),
         Key::Char('q') => app.running = false,

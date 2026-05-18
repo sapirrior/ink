@@ -43,8 +43,8 @@ Every module follows the **Connector (Facade)** pattern. `mod.rs` files contain 
 - **Advanced Navigation**:
     - Line-by-line (`j`, `k`)
     - Half-page (`d`, `u`)
-    - Full-page (`f`, `Space`, `b`)
-    - Document jumps (`g`, `G`, `<`, `>`)
+    - Full-page (`f`, `b`)
+    - Document jumps (`g`, `G`)
     - **Go-to-Line**: Jump to a specific line via the colon prompt (e.g., `:100`).
     - **Line Numbers**: Toggle line number visibility via `:N`.
 - **Interactive Help**: Press `h` for a command reference.
