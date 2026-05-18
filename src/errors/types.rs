@@ -5,7 +5,6 @@ use std::io;
 pub enum InklessError {
     Io(io::Error),
     Terminal(String),
-    Layout(String),
 }
 
 impl fmt::Display for InklessError {
@@ -13,7 +12,6 @@ impl fmt::Display for InklessError {
         match self {
             Self::Io(err) => write!(f, "I/O Error: {}", err),
             Self::Terminal(msg) => write!(f, "Terminal Error: {}", msg),
-            Self::Layout(msg) => write!(f, "Layout Error: {}", msg),
         }
     }
 }

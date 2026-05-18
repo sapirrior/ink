@@ -37,7 +37,7 @@ Every module follows the **Connector (Facade)** pattern. `mod.rs` files contain 
 ## 3. Core Features
 - **Smart Word-Wrapping**: Logical splitting at spaces or hyphens.
 - **Dynamic Margins**: Automatic 8% side padding.
-- **Responsive Resizing**: Instant layout recomputation on terminal resize.
+- **Responsive Resizing**: Signal-driven, real-time re-layout on `SIGWINCH`. Uses an optimized event-draining mechanism to ensure lag-free performance during rapid window dragging.
 - **Pipe Support**: Seamlessly functions as a standard pager (e.g., `ls | inkl`). Redirects TTY control for interactive events when stdin is a pipe.
 - **One Action, One Command**: A consistent, non-redundant command set (e.g., `q` to quit, no redundant `:q`).
 - **Regex Search Engine**: Forward/backward searching with inverted ANSI highlighting.
