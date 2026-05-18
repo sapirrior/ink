@@ -26,6 +26,12 @@ impl App {
         if !self.filenames.is_empty() {
             let filename = self.filenames[self.current_file_index].clone();
             self.doc.load_file(filename);
+        } else {
+            use std::io::IsTerminal;
+            let stdin = std::io::stdin();
+            if !stdin.is_terminal() {
+                self.doc.load_stream(stdin);
+            }
         }
     }
 

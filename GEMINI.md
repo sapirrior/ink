@@ -8,7 +8,7 @@ Inkless is a minimalist terminal pager written in Rust (2021 Edition). It priori
 - **Build System**: Cargo
 - **Versioning**: Synchronized with `Cargo.toml` via `env!("CARGO_PKG_VERSION")`.
 - **Primary Dependencies**:
-    - `crossterm`: Cross-platform terminal manipulation.
+    - `crossterm`: Cross-platform terminal manipulation (with `use-dev-tty` feature).
     - `regex`: Performance-oriented regular expressions.
 
 ## 2. Architectural Design
@@ -37,6 +37,7 @@ Every module follows the **Connector (Facade)** pattern. `mod.rs` files contain 
 - **Smart Word-Wrapping**: Logical splitting at spaces or hyphens.
 - **Dynamic Margins**: Automatic 8% side padding.
 - **Responsive Resizing**: Instant layout recomputation on terminal resize.
+- **Pipe Support**: Seamlessly functions as a standard pager (e.g., `ls | inkl`). Redirects TTY control for interactive events when stdin is a pipe.
 - **One Action, One Command**: A consistent, non-redundant command set (e.g., `q` to quit, no redundant `:q`).
 - **Regex Search Engine**: Forward/backward searching with inverted ANSI highlighting.
 - **Dynamic Versioning**: View current version via `--v` flag or help screen.

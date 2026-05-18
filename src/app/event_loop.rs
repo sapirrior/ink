@@ -2,12 +2,13 @@ use super::types::App;
 
 impl App {
     pub fn run(&mut self) {
+        self.init();
+        
         let _guard = crate::terminal::TerminalGuard::new();
         let (cols, rows) = crate::terminal::get_size();
         self.terminal_cols = cols;
         self.terminal_rows = rows;
         
-        self.init();
         self.layout.compute(&self.doc, cols);
 
         while self.running {
