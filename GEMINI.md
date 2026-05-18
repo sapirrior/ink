@@ -9,20 +9,21 @@ Ink is a minimalist, high-performance successor to GNU `less`, written in C11 wi
 - **Dependencies**: None (Standard C Library & POSIX APIs only)
 
 ## 2. Architectural Design
-Ink follows a Go-inspired **Domain-Driven Design (DDD)** where each feature set is encapsulated in an autonomous module.
-- **Single Header Rule**: Each module directory (e.g., `src/document/`) exposes its public API through exactly ONE unified header file (`document.h`). Internal logic is split across multiple `.c` files within the same directory.
-- **AppState Centralization**: A global `AppState` struct (`src/app/state.h`) anchors all domain-specific data, enabling decoupled interaction between modules.
-- **Command Pattern**: User actions are strictly isolated into individual files under `src/commands/` (e.g., `nav/up.c`, `search/execute.c`), orchestrated by a central dispatcher.
+Ink follows a flat, modular architecture designed for maximum clarity and minimal boilerplate.
+- **Single Header Rule**: The entire project's public API, structures, and constants are consolidated into exactly ONE unified header file (`source/ink.h`).
+- **Domain-Driven Implementation**: Implementation logic is grouped by domain into individual `.c` files directly within the `source/` directory. Subdirectories are strictly avoided.
+- **AppState Centralization**: A global `AppState` struct anchors all domain-specific data, enabling decoupled interaction between modules.
 
-### Core Modules:
-- `src/app/`: Orchestration and event loop.
-- `src/document/`: File I/O and text buffering.
-- `src/layout/`: Smart wrapping and coordinate mapping.
-- `src/terminal/`: POSIX raw mode and ANSI sequence management.
-- `src/view/`: Screen rendering and prompt handling.
-- `src/input/`: Keystroke parsing.
-- `src/utils/`: Generic helpers and the POSIX regex search engine.
-- `src/commands/`: Isolated action handlers categorized by domain.
+### Source Organization:
+- `source/main.c`: Entry point.
+- `source/app.c`: Orchestration and event loop.
+- `source/commands.c`: All user action handlers (navigation, search, system).
+- `source/document.c`: File I/O and text buffering.
+- `source/input.c`: Keystroke parsing.
+- `source/layout.c`: Smart wrapping and coordinate mapping.
+- `source/terminal.c`: POSIX raw mode and ANSI sequence management.
+- `source/utils.c`: Generic helpers and the POSIX regex search engine.
+- `source/view.c`: Screen rendering and prompt handling.
 ## 3. Core Features
 - **Smart Word-Wrapping**: Splits text at spaces or hyphens to maintain legibility.
 - **Dynamic Margins**: Automatically applies 8% side padding based on terminal width.

@@ -1,12 +1,8 @@
-#include "view.h"
-#include "../app/state.h"
-#include "../utils/utils.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
+#include "ink.h"
 #include <unistd.h>
 #include <regex.h>
+
+/* --- Render Buffer Implementation --- */
 
 void rb_init(RenderBuf *rb) {
     rb->cap = 16384;
@@ -37,7 +33,6 @@ void rb_printf(RenderBuf *rb, const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
     
-    // First pass to determine required size
     va_list ap_copy;
     va_copy(ap_copy, ap);
     int n = vsnprintf(NULL, 0, fmt, ap_copy);
@@ -60,7 +55,7 @@ void rb_printf(RenderBuf *rb, const char *fmt, ...) {
 
 void rb_flush(RenderBuf *rb) {
     if (rb->len > 0) {
-        write(STDOUT_FILENO, rb->data, rb->len);
+        (void)write(STDOUT_FILENO, rb->data, rb->len);
         rb->len = 0;
         rb->data[0] = '\0';
     }
@@ -73,11 +68,37 @@ void rb_free(RenderBuf *rb) {
     rb->cap = 0;
 }
 
+/* --- Prompt Handling --- */
+
+void view_read_prompt(AppState *app, char prompt_char, char *buf, size_t size) {
+    size_t len = 0;
+    buf[0] = '\0';
+
+    while (1) {
+        RenderBuf rb;
+        rb_init(&rb);
+        rb_printf(&rb, "\x1b[%d;1H\x1b[2K%c%s", app->ts.rows, prompt_char, buf);
+        rb_flush(&rb);
+        rb_free(&rb);
+
+        int c = input_read_key();
+        if (c == '\r' || c == '\n') break;
+        if (c == '\x1b') { len = 0; buf[0] = '\0'; break; }
+        if (c == 127 || c == 8) { // Backspace
+            if (len > 0) buf[--len] = '\0';
+        } else if (c >= 32 && c < 127 && len < size - 1) {
+            buf[len++] = (char)c;
+            buf[len] = '\0';
+        }
+    }
+}
+
+/* --- Screen Rendering --- */
+
 static void view_render_help(AppState *app, RenderBuf *rb) {
     int rows = app->ts.rows;
     int cols = app->ts.cols;
     
-    // Clear screen and move to top
     rb_append(rb, "\x1b[2J\x1b[H", 7);
     
     const char *title = "--- Ink Pager Help ---";
@@ -113,7 +134,6 @@ void view_render_screen(AppState *app) {
     int view_height = app->ts.rows - 1;
     if (view_height < 0) view_height = 0;
 
-    // Safety clamp for scroll_y
     if (app->scroll_y < 0) app->scroll_y = 0;
     if (app->layout.count > 0) {
         if (app->scroll_y >= (int)app->layout.count) {
@@ -144,14 +164,12 @@ void view_render_screen(AppState *app) {
                 const char *ptr = line;
                 while (regexec(&regex, ptr, 1, &pmatch, 0) == 0) {
                     size_t match_len = (size_t)(pmatch.rm_eo - pmatch.rm_so);
-                    // Text before match
                     rb_append(&rb, ptr, (size_t)pmatch.rm_so);
-                    // Match (inverted)
                     rb_append(&rb, "\x1b[7m", 4);
                     rb_append(&rb, ptr + pmatch.rm_so, match_len);
                     rb_append(&rb, "\x1b[m", 3);
                     ptr += pmatch.rm_eo;
-                    if (pmatch.rm_so == pmatch.rm_eo) ptr++; // Avoid infinite loop on empty matches
+                    if (pmatch.rm_so == pmatch.rm_eo) ptr++;
                     if (*ptr == '\0') break;
                 }
                 rb_append(&rb, ptr, strlen(ptr));

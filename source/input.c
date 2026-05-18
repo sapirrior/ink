@@ -1,7 +1,6 @@
-#include "input.h"
+#include "ink.h"
 #include <unistd.h>
 #include <sys/select.h>
-#include <string.h>
 
 int input_read_key(void) {
     char c;

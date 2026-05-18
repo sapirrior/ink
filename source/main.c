@@ -1,5 +1,4 @@
-#include "app/app.h"
-#include <stdio.h>
+#include "ink.h"
 
 int main(int argc, char **argv) {
     if (argc < 2) {

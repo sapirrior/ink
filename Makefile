@@ -1,12 +1,12 @@
 CC = gcc
-CFLAGS = -std=c11 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -pedantic -O2 -Isrc
+CFLAGS = -std=c11 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -pedantic -O2 -Isource
 LDFLAGS = 
 
-SRC_DIR = src
+SRC_DIR = source
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/objs
 
-SRCS = $(shell find $(SRC_DIR) -name "*.c")
+SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 TARGET = $(BUILD_DIR)/ink
 

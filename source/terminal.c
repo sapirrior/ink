@@ -1,8 +1,6 @@
-#include "terminal.h"
+#include "ink.h"
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 void terminal_setup(TerminalState *ts) {
     if (tcgetattr(STDIN_FILENO, &ts->orig_termios) == -1) {
@@ -43,4 +41,29 @@ void terminal_get_size(TerminalState *ts) {
         ts->rows = ws.ws_row;
         ts->cols = ws.ws_col;
     }
+}
+
+void terminal_enter_alt_buffer(void) {
+    const char *s = "\x1b[?1049h";
+    (void)write(STDOUT_FILENO, s, strlen(s));
+}
+
+void terminal_exit_alt_buffer(void) {
+    const char *s = "\x1b[?1049l";
+    (void)write(STDOUT_FILENO, s, strlen(s));
+}
+
+void terminal_hide_cursor(void) {
+    const char *s = "\x1b[?25l";
+    (void)write(STDOUT_FILENO, s, strlen(s));
+}
+
+void terminal_show_cursor(void) {
+    const char *s = "\x1b[?25h";
+    (void)write(STDOUT_FILENO, s, strlen(s));
+}
+
+void terminal_clear(void) {
+    const char *s = "\x1b[2J\x1b[H";
+    (void)write(STDOUT_FILENO, s, strlen(s));
 }

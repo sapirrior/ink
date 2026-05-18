@@ -1,7 +1,11 @@
-#include "layout.h"
-#include "../utils/utils.h"
-#include <stdlib.h>
-#include <string.h>
+#include "ink.h"
+
+void layout_init(Layout *layout) {
+    layout->display_lines = NULL;
+    layout->raw_to_display = NULL;
+    layout->count = 0;
+    layout->cap = 0;
+}
 
 static void layout_add_line(Layout *layout, const char *line) {
     if (layout->count >= layout->cap) {
@@ -80,4 +84,15 @@ void layout_compute(Layout *layout, Document *doc, int cols) {
             }
         }
     }
+}
+
+void layout_free(Layout *layout) {
+    if (layout->display_lines) {
+        for (size_t i = 0; i < layout->count; i++) {
+            free(layout->display_lines[i]);
+        }
+        free(layout->display_lines);
+    }
+    if (layout->raw_to_display) free(layout->raw_to_display);
+    layout_init(layout);
 }
