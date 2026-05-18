@@ -1,8 +1,10 @@
 #include "inkless.h"
+#include <unistd.h>
 
 int main(int argc, char **argv) {
-    if (argc < 2) {
+    if (argc < 2 && isatty(STDIN_FILENO)) {
         fprintf(stderr, "Usage: %s <filename> [filename...]\n", argv[0]);
+        fprintf(stderr, "   or: <command> | %s\n", argv[0]);
         return 1;
     }
 

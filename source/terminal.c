@@ -1,10 +1,21 @@
 #include "inkless.h"
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <fcntl.h>
 
 void terminal_setup(TerminalState *ts) {
     ts->is_active = false;
-    if (tcgetattr(STDIN_FILENO, &ts->orig_termios) == -1) {
+
+    if (isatty(STDIN_FILENO)) {
+        ts->tty_fd = STDIN_FILENO;
+    } else {
+        ts->tty_fd = open("/dev/tty", O_RDONLY);
+        if (ts->tty_fd == -1) {
+            ink_die("Terminal setup failed: Could not open /dev/tty");
+        }
+    }
+
+    if (tcgetattr(ts->tty_fd, &ts->orig_termios) == -1) {
         ink_die("Terminal setup failed: tcgetattr");
     }
 
@@ -16,7 +27,7 @@ void terminal_setup(TerminalState *ts) {
     raw.c_cc[VMIN] = 0;
     raw.c_cc[VTIME] = 1;
 
-    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) {
+    if (tcsetattr(ts->tty_fd, TCSAFLUSH, &raw) == -1) {
         ink_die("Terminal setup failed: tcsetattr");
     }
 
@@ -30,7 +41,12 @@ void terminal_restore(TerminalState *ts) {
     if (!ts->is_active) return;
     terminal_exit_alt_buffer();
     terminal_show_cursor();
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &ts->orig_termios);
+    tcsetattr(ts->tty_fd, TCSAFLUSH, &ts->orig_termios);
+    
+    if (ts->tty_fd != STDIN_FILENO) {
+        close(ts->tty_fd);
+    }
+    
     ts->is_active = false;
 }
 

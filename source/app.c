@@ -40,7 +40,11 @@ void app_init(AppState *app, int num_files, const char **filenames) {
 }
 
 void app_switch_file(AppState *app, int index) {
-    if (index < 0 || index >= app->num_files) return;
+    if (app->num_files > 0) {
+        if (index < 0 || index >= app->num_files) return;
+    } else if (index != 0) {
+        return;
+    }
 
     doc_free(&app->doc);
     layout_free(&app->layout);
@@ -48,7 +52,12 @@ void app_switch_file(AppState *app, int index) {
     doc_init(&app->doc);
     layout_init(&app->layout);
     
-    doc_load_file(&app->doc, app->filenames[index]);
+    if (app->num_files > 0) {
+        doc_load_file(&app->doc, app->filenames[index]);
+    } else {
+        doc_load_stream(&app->doc, stdin);
+    }
+    
     layout_compute(&app->layout, &app->doc, app->ts.cols);
     
     app->current_file_index = index;

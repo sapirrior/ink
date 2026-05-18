@@ -42,6 +42,7 @@ typedef enum {
 typedef struct {
     int rows;
     int cols;
+    int tty_fd;
     struct termios orig_termios;
     bool is_active;
 } TerminalState;
@@ -111,6 +112,7 @@ void terminal_clear(void);
 /* document.c */
 void doc_init(Document *doc);
 void doc_load_file(Document *doc, const char *filename);
+void doc_load_stream(Document *doc, FILE *stream);
 void doc_free(Document *doc);
 
 /* layout.c */

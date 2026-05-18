@@ -28,6 +28,7 @@ Inkless follows a flat, modular architecture designed for maximum clarity and mi
 - **Smart Word-Wrapping**: Splits text at spaces or hyphens to maintain legibility.
 - **Dynamic Margins**: Automatically applies 8% side padding based on terminal width.
 - **Responsive Resizing**: Full `SIGWINCH` support; layout and margins recompute instantly on terminal resize.
+- **Pipe Support**: Seamlessly functions as a standard POSIX pager (e.g., `ls | inkl`), decoupling data input from interactive terminal control via `/dev/tty` redirection.
 - **Advanced Navigation**:
     - Line-by-line (`j`, `k`)
     - Half-page (`d`, `u`)
@@ -66,7 +67,9 @@ make clean    # Removes the build directory
 ## 6. Coding Conventions
 - **Naming**: `snake_case` for functions/variables, `PascalCase` for structs.
 - **Hardened Integrity**:
-    - **Defensive I/O**: Strict `realloc` validation and CRLF handling during file load.
+    - **Graceful Failure**: Centralized `ink_die` error handling with automatic terminal restoration via `g_app` state tracking.
+    - **Safe Allocation**: Mandatory use of `xmalloc`, `xrealloc`, and `xstrdup` wrappers to eliminate OOM boilerplate and ensure consistent exit behavior.
+    - **Defensive I/O**: Strict CRLF handling during file load.
     - **Memory Safety**: OOB prevention in layout mapping and dynamic RenderBuf sizing to eliminate overflow risks.
     - **Robust Navigation**: Clamped scroll and view logic ensures stability during extreme terminal resizing.
     - **ANSI Hygiene**: Strict attribute resetting prevents UI glitches (e.g., screen inversion) during prompt interactions.

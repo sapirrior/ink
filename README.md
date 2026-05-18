@@ -13,6 +13,7 @@ Inkless is a terminal-based text pager written in C11 for POSIX systems. It focu
 
 - **Word-Wrapping**: Splits lines at whitespace or hyphens.
 - **Fixed Margins**: Applies a constant 8% side-margin to the viewport.
+- **Pipe Support**: Read input directly from stdin (e.g., `ls | inkl`).
 - **Regex Search**: Forward and backward search using POSIX Extended Regular Expressions.
 - **Line Numbering**: Optional line number display (`:N`) within the margin.
 - **Navigation**: Supports line-by-line, page-by-page, and direct line jumping (`:<number>`).
@@ -31,7 +32,11 @@ The executable will be located at `build/inkl`.
 ## Usage
 
 ```bash
+# View one or more files
 ./build/inkl <filename> [filename2 ...]
+
+# Use as a pager for other commands
+ls -la | ./build/inkl
 ```
 
 ## Commands

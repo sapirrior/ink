@@ -6,15 +6,12 @@ void doc_init(Document *doc) {
     doc->line_cap = 0;
 }
 
-void doc_load_file(Document *doc, const char *filename) {
-    FILE *f = fopen(filename, "r");
-    if (!f) ink_die("Could not open file: %s", filename);
-
+void doc_load_stream(Document *doc, FILE *stream) {
     char *line = NULL;
     size_t len = 0;
     ssize_t read;
 
-    while ((read = getline(&line, &len, f)) != -1) {
+    while ((read = getline(&line, &len, stream)) != -1) {
         if (doc->line_count >= doc->line_cap) {
             size_t new_cap = doc->line_cap == 0 ? 128 : doc->line_cap * 2;
             doc->raw_lines = xrealloc(doc->raw_lines, sizeof(char *) * new_cap);
@@ -34,6 +31,12 @@ void doc_load_file(Document *doc, const char *filename) {
         doc->raw_lines[doc->line_count++] = xstrdup(line);
     }
     free(line);
+}
+
+void doc_load_file(Document *doc, const char *filename) {
+    FILE *f = fopen(filename, "r");
+    if (!f) ink_die("Could not open file: %s", filename);
+    doc_load_stream(doc, f);
     fclose(f);
 }
 
