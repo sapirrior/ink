@@ -1,4 +1,4 @@
-use super::types::Layout;
+use super::core::Layout;
 use crate::document::Document;
 
 impl Layout {

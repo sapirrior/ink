@@ -19,9 +19,9 @@ Every module follows the **Connector (Facade)** pattern. `mod.rs` files contain 
 
 ### Directory Structure:
 - `src/main.rs`: Entry point, CLI parsing, and `--v` flag handling.
-- `src/app/`: Application orchestration (`types.rs`, `lifecycle.rs`, `event_loop.rs`).
-- `src/document/`: Text buffering and I/O (`io.rs`, `state.rs`, `types.rs`).
-- `src/layout/`: Smart wrapping and coordinate mapping (`compute.rs`, `state.rs`, `types.rs`).
+- `src/app/`: Application orchestration (`core.rs`, `event_loop.rs`).
+- `src/document/`: Text buffering and I/O (`core.rs`, `io.rs`).
+- `src/layout/`: Smart wrapping and coordinate mapping (`core.rs`, `compute.rs`).
 - `src/terminal/`: Terminal state and RAII cleanup (`guard.rs`, `utils.rs`).
 - `src/input/`: Keystroke parsing using `crossterm` (`keys.rs`, `reader.rs`).
 - `src/view/`: Screen rendering and prompt handling (`render.rs`, `prompt.rs`).

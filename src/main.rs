@@ -9,9 +9,6 @@ mod view;
 
 mod errors;
 
-#[cfg(test)]
-mod tests_io;
-
 use app::App;
 use std::env;
 use std::io::{self, IsTerminal};

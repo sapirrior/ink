@@ -1,9 +1,30 @@
-use super::types::App;
 use crate::document::Document;
 use crate::layout::Layout;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::mpsc;
+use std::sync::mpsc::{self, Receiver};
+
+pub struct App {
+    pub doc: Document,
+    pub layout: Layout,
+    pub scroll_y: usize,
+    pub filenames: Vec<String>,
+    pub current_file_index: usize,
+    pub last_pattern: String,
+    pub last_search_dir: i32, // 1 for forward, -1 for backward
+    pub search_failed: bool,
+    pub search_wrapped: bool,
+    pub show_help: bool,
+    pub show_line_numbers: bool,
+    pub running: bool,
+    pub follow_mode: bool,
+    pub is_loading: bool,
+    pub terminal_cols: u16,
+    pub terminal_rows: u16,
+    pub error_message: Option<String>,
+    pub line_receiver: Option<Receiver<String>>,
+    pub stop_io: Arc<AtomicBool>,
+}
 
 impl App {
     pub fn new(filenames: Vec<String>) -> Self {
@@ -36,9 +57,8 @@ impl App {
             self.start_loading_file(filename);
         } else {
             use std::io::IsTerminal;
-            let stdin = std::io::stdin();
-            if !stdin.is_terminal() {
-                self.start_loading_stdin();
+            if !std::io::stdin().is_terminal() {
+                self.start_loading_reader(std::io::stdin());
             }
         }
     }
@@ -46,35 +66,25 @@ impl App {
     fn start_loading_file(&mut self, filename: String) {
         use std::fs::File;
         match File::open(&filename) {
-            Ok(file) => {
-                self.stop_io.store(true, Ordering::SeqCst);
-                self.stop_io = Arc::new(AtomicBool::new(false));
-                let (tx, rx) = mpsc::channel();
-                self.line_receiver = Some(rx);
-                self.is_loading = true;
-                Document::spawn_reader(file, tx, Arc::clone(&self.stop_io));
-            }
-            Err(e) => {
-                self.error_message = Some(format!("Error opening {}: {}", filename, e));
-            }
+            Ok(file) => self.start_loading_reader(file),
+            Err(e) => self.error_message = Some(format!("Error opening {}: {}", filename, e)),
         }
     }
 
-    fn start_loading_stdin(&mut self) {
+    fn start_loading_reader<R: std::io::Read + Send + 'static>(&mut self, reader: R) {
         self.stop_io.store(true, Ordering::SeqCst);
         self.stop_io = Arc::new(AtomicBool::new(false));
         let (tx, rx) = mpsc::channel();
         self.line_receiver = Some(rx);
         self.is_loading = true;
-        Document::spawn_reader(std::io::stdin(), tx, Arc::clone(&self.stop_io));
+        Document::spawn_reader(reader, tx, Arc::clone(&self.stop_io));
     }
 
     pub fn switch_file(&mut self, index: usize) {
-        if index < self.filenames.len() {
+        if let Some(filename) = self.filenames.get(index).cloned() {
             self.current_file_index = index;
             self.doc.clear();
             self.scroll_y = 0;
-            let filename = self.filenames[self.current_file_index].clone();
             self.start_loading_file(filename);
             self.layout.compute(&self.doc, self.terminal_cols);
         }

@@ -1,4 +1,4 @@
-use super::types::App;
+use super::core::App;
 use std::time::Duration;
 
 impl App {

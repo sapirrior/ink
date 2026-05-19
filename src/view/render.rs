@@ -119,6 +119,29 @@ pub fn render_screen(app: &App) {
     let _ = stdout.flush();
 }
 
+const HELP_LINES: &[&str] = &[
+    "j, Down       Scroll down one line",
+    "k, Up         Scroll up one line",
+    "d             Scroll down half a page",
+    "u             Scroll up half a page",
+    "f, PageDown   Scroll down one page",
+    "b, PageUp     Scroll up one page",
+    "g, Home       Go to top of document",
+    "G, End        Go to end of document",
+    "F             Toggle follow mode (like tail -f)",
+    "/             Search forward for a pattern",
+    "?             Search backward for a pattern",
+    "n             Repeat last search",
+    "N             Repeat last search in reverse direction",
+    ":n            Next file",
+    ":p            Previous file",
+    ":N            Toggle line numbers",
+    ":<num>        Jump to line <num>",
+    "h             Show this help",
+    "q             Quit",
+    "Esc           Clear search highlights / Return from help",
+];
+
 fn render_help(app: &App, stdout: &mut io::Stdout) {
     let _ = stdout.queue(style::SetAttribute(Attribute::Reset));
     let _ = stdout.queue(Clear(ClearType::All));
@@ -129,30 +152,7 @@ fn render_help(app: &App, stdout: &mut io::Stdout) {
     let _ = stdout.queue(cursor::MoveTo(title_x as u16, 0));
     let _ = stdout.queue(Print(title));
 
-    let help_lines = [
-        "j, Down       Scroll down one line",
-        "k, Up         Scroll up one line",
-        "d             Scroll down half a page",
-        "u             Scroll up half a page",
-        "f, PageDown   Scroll down one page",
-        "b, PageUp     Scroll up one page",
-        "g, Home       Go to top of document",
-        "G, End        Go to end of document",
-        "F             Toggle follow mode (like tail -f)",
-        "/             Search forward for a pattern",
-        "?             Search backward for a pattern",
-        "n             Repeat last search",
-        "N             Repeat last search in reverse direction",
-        ":n            Next file",
-        ":p            Previous file",
-        ":N            Toggle line numbers",
-        ":<num>        Jump to line <num>",
-        "h             Show this help",
-        "q             Quit",
-        "Esc           Clear search highlights / Return from help",
-    ];
-
-    for (i, line) in help_lines.iter().enumerate() {
+    for (i, line) in HELP_LINES.iter().enumerate() {
         if i + 2 >= app.terminal_rows as usize {
             break;
         }

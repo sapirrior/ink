@@ -1,5 +1,4 @@
+mod core;
 mod io;
-mod state;
-mod types;
 
-pub use types::Document;
+pub use core::Document;

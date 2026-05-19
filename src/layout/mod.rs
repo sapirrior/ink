@@ -1,5 +1,4 @@
 mod compute;
-mod state;
-mod types;
+mod core;
 
-pub use types::Layout;
+pub use core::Layout;

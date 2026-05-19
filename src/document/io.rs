@@ -4,7 +4,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::Sender;
 use std::thread;
 
-use super::types::Document;
+use super::core::Document;
 
 impl Document {
     pub fn spawn_reader<R: io::Read + Send + 'static>(
